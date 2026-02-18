@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.venv/
+venv/
+tmp/
+
+# Runtime memory artifacts
+memory_system/data/
+memory_system/daily/
+memory_system/projects/
+memory_system/nodes_rendered/
+
+# Packaging artifacts
+build/
+dist/
+*.egg-info/

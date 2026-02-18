@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "sessionRoots": [
+    "~/.openclaw/agents/main/sessions",
+    "~/.clawdbot/agents/main/sessions",
+    "~/.codex/sessions",
+    "~/.codex/agents/main/sessions",
+    "~/.claude/sessions",
+    "~/.claude/agents/main/sessions",
+    "~/.claude/projects"
+  ],
+  "checkpoint": {
+    "outDir": "~/.openclaw/memorydb/data/summaries",
+    "statusFile": "~/.openclaw/memorydb/data/LAST_CHECKPOINT.md"
+  }
+}

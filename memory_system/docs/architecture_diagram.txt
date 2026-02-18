@@ -1,0 +1,56 @@
+# Memory System Architecture Diagram
+
+## High-Level View
+
+User Interaction
+       ↓
+┌─────────────────┐
+│   AI Model      │ ← Context Window
+└─────────────────┘
+       ↑
+┌─────────────────┐
+│  Memory System  │
+│                 │
+│  ┌─────────────┐│ ← Runtime Policy Injection
+│  │ Core Policy ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │ MEMORY.md   ││ ← Curated Memory
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │ Daily Logs  ││ ← Raw Events
+│  │ YYYY-MM-DD  ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │ Memory      ││
+│  │ Nodes       ││ ← Structured Data
+│  │ nodes.jsonl ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │ Project     ││
+│  │ Memories    ││ ← Isolated Context
+│  │ projects/*  ││
+│  └─────────────┘│
+└─────────────────┘
+       ↑
+External Systems & Tools
+
+## Flow During User Request
+
+1. User Message
+   ↓
+2. Policy Analysis (build_runtime_policy.sh)
+   ↓
+3. Memory Retrieval (memory_search + memory_get)
+   ↓
+4. Context Assembly (MEMORY.md + relevant nodes)
+   ↓
+5. AI Model Processing
+   ↓
+6. Memory Updates (if needed)
+   ↓
+7. Response Generation
