@@ -99,7 +99,6 @@ export MEMORY_SESSION_ROOTS="$HOME/.codex/sessions:$HOME/.claude/projects:$HOME/
 - Core guide: `memory_system/README.md`
 - Agent onboarding: `memory_system/docs/AGENT_MEMORY_ONBOARDING.md`
 - Integration: `memory_system/docs/INTEGRATION.md`
-- Docs status map: `memory_system/docs/STATUS.md`
 - Contributing: `CONTRIBUTING.md`
 - Security: `SECURITY.md`
 - Code of conduct: `CODE_OF_CONDUCT.md`

@@ -145,7 +145,6 @@ memory_system/
 │
 ├── docs/                      # Architecture and specification docs
 │   ├── AGENT_MEMORY_ONBOARDING.md  # START HERE — full agent guide
-│   ├── STATUS.md                   # Which docs are authoritative vs historical
 │   ├── NODES_SPEC.md               # Node schema and rules
 │   ├── EMBEDDINGS_SPEC.md          # Vector index specification
 │   ├── INTEGRATION.md              # How to integrate into your agent
@@ -153,10 +152,7 @@ memory_system/
 │   ├── memory_guide.md             # Architecture deep-dive
 │   ├── architecture.md             # Design overview
 │   ├── architecture_diagram.txt    # ASCII diagram
-│   ├── custom_vector_architecture.md  # Custom vector store design
-│   ├── MAINTENANCE_CHECKLIST.md    # Maintenance audit template
-│   ├── PRD_MEMORY_OPTIMIZATION.md  # Optimization PRD
-│   └── PRD_embeddings_local.md     # Local embeddings PRD
+│   └── custom_vector_architecture.md  # Custom vector store design
 │
 ├── templates/                 # Scaffolding for new projects
 │   ├── project_dossier.md     #   Project metadata template
@@ -427,9 +423,6 @@ See [`docs/EMBEDDINGS_SPEC.md`](docs/EMBEDDINGS_SPEC.md) for the full specificat
 | [`docs/architecture.md`](docs/architecture.md) | Design overview and principles |
 | [`docs/architecture_diagram.txt`](docs/architecture_diagram.txt) | ASCII architecture diagram |
 | [`docs/custom_vector_architecture.md`](docs/custom_vector_architecture.md) | Custom vector store design spec |
-| [`docs/MAINTENANCE_CHECKLIST.md`](docs/MAINTENANCE_CHECKLIST.md) | Maintenance audit template and results |
-| [`docs/PRD_MEMORY_OPTIMIZATION.md`](docs/PRD_MEMORY_OPTIMIZATION.md) | Memory optimization product requirements |
-| [`docs/PRD_embeddings_local.md`](docs/PRD_embeddings_local.md) | Local embeddings product requirements |
 | [`templates/project_dossier.md`](templates/project_dossier.md) | Template for project metadata dossiers |
 | [`templates/example_nodes.jsonl`](templates/example_nodes.jsonl) | Example nodes showing all types |
 | [`policy/core.md`](policy/core.md) | Compiled always-on policy rules |
