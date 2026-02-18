@@ -3,7 +3,7 @@ project:
   slug: ""
   name: ""
   repo_path: ""
-  status_file: "STATUS.md"
+  status_file: "PROJECT_STATUS.md"
   runbook_file: "RUNBOOK.md"
   primary_language: ""
   tags: []

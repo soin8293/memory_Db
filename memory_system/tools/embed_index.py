@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a local embeddings *index* (chunks table) from nodes.jsonl.
 
-This is step 2 of PRD_embeddings_local.md:
+This builds the local chunk/embedding index:
 - writes chunk rows into SQLite
 - leaves embedding columns NULL (no model/deps required)
 
