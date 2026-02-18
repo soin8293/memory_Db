@@ -369,27 +369,16 @@ Commands: add, recall, query, bootstrap, tags, jot, jot-batch, lookup, ws
 | `tools/auto_checkpoint_wrapper.sh` | Wrapper with error capture | Called by the plist daemon |
 | `tools/run_checkpoint_cron.sh` | Cron-safe checkpoint runner | Silent on success, alerts on failure |
 | `tools/maintenance.sh` | Full maintenance pipeline | Generate summaries + proposals (hands-off) |
-| `tools/maintenance_status.sh` | Extract maintenance report status | Quick check on last maintenance run |
-| `tools/weekly_review.sh` | Weekly review of daily logs | Produce weekly summary + proposals |
 | `tools/doctor.sh` | Diagnostic health check | Validate index consistency, permissions, layouts |
-| `tools/smoke_memory.sh` | Quick smoke test | Verify basic read/write/search works |
 | `tools/ensure_daily_log.sh` | Create today's daily log | Idempotent — safe to call multiple times |
 | `tools/security_check.sh` | Detect exposure footguns | Check for secrets, permissions issues |
-| `tools/gateway_crash_watch.sh` | Detect gateway restarts | Monitor for infrastructure issues |
-| `tools/gateway_watch_loop.sh` | Continuous gateway monitor | Polls and sends Telegram alerts |
 | `tools/summarize_sessions.sh` | Batch summarize many sessions | Process backlog of session logs |
 
 ### Other tools
 
 | Tool | What it does |
 |------|-------------|
-| `tools/bootstrap_project.py` | Scaffold a new per-project memory store |
-| `tools/bundle_scaffold.py` | Scaffold a new operational bundle |
-| `tools/bundle_suggest.py` | Suggest whether a new bundle is needed |
-| `tools/gmail_search.py` | Read-only Gmail search via OAuth |
-| `tools/action_gate.md` | Documentation for the hard guardrail pattern |
 | `tools/stopwords_basic.txt` | 126 English stopwords for keyword filtering |
-| `tools/com.openclaw.auto-checkpoint.plist` | launchd daemon config (macOS) |
 
 ---
 
@@ -506,8 +495,8 @@ bash memory_system/tools/ensure_daily_log.sh
 # Full diagnostic (index consistency, permissions, stale data)
 bash memory_system/tools/doctor.sh
 
-# Quick smoke test (basic read/write/search)
-bash memory_system/tools/smoke_memory.sh
+# Public command wrapper (doctor + index + session pipelines)
+bash memory_system/tools/memory_ops.sh doctor
 
 # Security check (secrets exposure, permissions)
 bash memory_system/tools/security_check.sh

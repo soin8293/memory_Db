@@ -309,8 +309,7 @@ python3 memory_system/tools/chunk_session_topics.py \
 
 **Health check:**
 ```bash
-memory_system/tools/smoke_memory.sh
-memory_system/tools/doctor.sh
+bash memory_system/tools/memory_ops.sh doctor
 ```
 
 ### Per-project MemoryDB

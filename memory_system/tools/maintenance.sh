@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Clawdbot Memory Maintenance (hands-off)
+# Memory maintenance (hands-off)
 # Safe-by-default: generates summaries + proposals; does not auto-apply nodes.
 
-WORKSPACE="${WORKSPACE:-$HOME/clawd}"
-WORKSPACE="${WORKSPACE/#\~/$HOME}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+WORKSPACE="${WORKSPACE:-$REPO_ROOT}"
 
 LIMIT_SESSIONS="${LIMIT_SESSIONS:-10}"
 AGENT_ID="${AGENT_ID:-main}"
@@ -70,17 +71,20 @@ TS="$(date -Iseconds)"
   fi
   echo
 
-  echo "### 4) Reindex memory"
-  clawdbot memory index --agent main || true
+  echo "### 4) Reindex memory (public pipeline)"
+  if [[ -x "memory_system/tools/memory_ops.sh" ]]; then
+    bash memory_system/tools/memory_ops.sh index-fast || true
+  else
+    echo "WARN: memory_ops.sh missing; skipping"
+  fi
   echo
 
-  echo "### 5) Smoke checks"
-  if [[ -x "memory_system/tools/smoke_memory.sh" ]]; then
-    memory_system/tools/smoke_memory.sh || true
+  echo "### 5) Doctor checks"
+  if [[ -x "memory_system/tools/doctor.sh" ]]; then
+    bash memory_system/tools/doctor.sh || true
   else
-    echo "WARN: smoke_memory.sh missing"
+    echo "WARN: doctor.sh missing"
   fi
 
   echo "\n## Done" 
 } | tee "$REPORT_FILE"
-

@@ -148,16 +148,16 @@ Any agent can bootstrap a new project store at any time.
 
 ### Checkpoint (cron)
 
-Runs every 10 minutes via launchd (`com.openclaw.auto-checkpoint.plist`, `StartInterval=600`). The script is idempotent — skips if the session file hasn't changed since last run:
+Run periodically via your preferred scheduler (cron, launchd, CI). `auto_checkpoint.sh` is idempotent and skips if the session file hasn't changed since last run:
 1. Finds newest main session JSONL
 2. Summarizes to `memory_system/data/summaries/<session>.md`
 3. Writes proof to `memory_system/data/LAST_CHECKPOINT.md`
 
 ### Health checks
 
-- `smoke_memory.sh` — quick smoke test (nodes exist, tools run)
+- `memory_ops.sh doctor` — one-command health diagnostics
 - `doctor.sh` — diagnostic scan (index consistency, stale data)
-- `maintenance.sh` / `maintenance_status.sh` — cleanup and status
+- `maintenance.sh` — end-to-end maintenance report + refresh
 
 ### Incremental indexing
 

@@ -89,5 +89,5 @@ Embedding/indexing is automatic — `add_node.py` calls `render_nodes.py` and `r
   "AgentOffice ralph loop rate limit"
 
 # Health check
-memory_system/tools/smoke_memory.sh
+bash memory_system/tools/memory_ops.sh doctor
 ```

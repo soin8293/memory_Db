@@ -52,9 +52,9 @@ EOF
   >/dev/null
 
 # Assertions
-out_a="$($PY "$ROOT/memory_system/tools/recall.py" --query "$KW" --project-id "$PROJ_A" --db "$DB" --backend hash --topk 10)"
-out_b="$($PY "$ROOT/memory_system/tools/recall.py" --query "$KW" --project-id "$PROJ_B" --db "$DB" --backend hash --topk 10)"
-out_g="$($PY "$ROOT/memory_system/tools/recall.py" --query "$KW" --global --db "$DB" --backend hash --topk 10)"
+out_a="$($PY "$ROOT/memory_system/tools/recall.py" --query "$KW" --project-id "$PROJ_A" --db "$DB" --backend hash --topk 10 --no-openclaw)"
+out_b="$($PY "$ROOT/memory_system/tools/recall.py" --query "$KW" --project-id "$PROJ_B" --db "$DB" --backend hash --topk 10 --no-openclaw)"
+out_g="$($PY "$ROOT/memory_system/tools/recall.py" --query "$KW" --global --db "$DB" --backend hash --topk 10 --no-openclaw)"
 
 python3 - <<PY
 import json, sys
