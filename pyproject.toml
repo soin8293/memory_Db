@@ -16,9 +16,9 @@ keywords = ["rag", "memory", "agent", "openclaw", "codex", "claude"]
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/AmirahCo/memory_Db"
-Repository = "https://github.com/AmirahCo/memory_Db"
-Issues = "https://github.com/AmirahCo/memory_Db/issues"
+Homepage = "https://github.com/soin8293/memory_Db"
+Repository = "https://github.com/soin8293/memory_Db"
+Issues = "https://github.com/soin8293/memory_Db/issues"
 
 [project.optional-dependencies]
 semantic = ["faiss-cpu>=1.7.0", "numpy>=1.20.0", "fastembed>=0.1.0"]

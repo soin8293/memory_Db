@@ -15,6 +15,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, Iterable, List, Optional
@@ -43,6 +44,21 @@ BASE_TAGS = {
     "next-step",
     "contact",
 }
+
+
+def _python_tool_command(tool_name: str, *args: str) -> List[str]:
+    """Build a tool command using the interpreter running MemoryDB."""
+    return [sys.executable, os.path.join(PACKAGE_DIR, "tools", tool_name), *args]
+
+
+def _run_tool_silently(tool_name: str, *args: str) -> None:
+    """Run a bundled maintenance tool without platform-specific shell syntax."""
+    subprocess.run(
+        _python_tool_command(tool_name, *args),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
 
 OPTIONAL_TAGS = {
     "metric",
@@ -234,14 +250,12 @@ class MemoryDB:
 
         # Render global views only for global ledger
         if self.is_global:
-            render_path = os.path.join(PACKAGE_DIR, "tools", "render_nodes.py")
-            openclaw_render = os.path.join(PACKAGE_DIR, "tools", "render_nodes_for_openclaw.py")
             try:
-                os.system(f"python3 {render_path} >/dev/null 2>&1")
+                _run_tool_silently("render_nodes.py")
             except Exception:
                 pass
             try:
-                os.system(f"python3 {openclaw_render} >/dev/null 2>&1")
+                _run_tool_silently("render_nodes_for_openclaw.py")
             except Exception:
                 pass
 
@@ -249,20 +263,19 @@ class MemoryDB:
 
     def recall(self, query: str) -> str:
         if self.is_global:
-            cmd = ["python3", os.path.join(PACKAGE_DIR, "tools", "recall.py"), "--query", query, "--global"]
+            cmd = _python_tool_command("recall.py", "--query", query, "--global")
         else:
-            cmd = [
-                "python3",
-                os.path.join(PACKAGE_DIR, "tools", "recall.py"),
+            cmd = _python_tool_command(
+                "recall.py",
                 "--query",
                 query,
                 "--nodes",
                 os.path.join(self.project_dir, "nodes.jsonl"),
-            ]
+            )
         return subprocess.check_output(cmd, text=True)
 
     def query(self, scope: Optional[str] = None, node_type: Optional[str] = None) -> str:
-        args: List[str] = ["python3", os.path.join(PACKAGE_DIR, "tools", "query_nodes.py")]
+        args = _python_tool_command("query_nodes.py")
         if self.is_global:
             args += ["--nodes", GLOBAL_NODES]
         else:

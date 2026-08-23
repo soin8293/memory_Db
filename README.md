@@ -12,22 +12,25 @@ In practice, users create a project `MemoryDB` object and treat it as the
 agent's memory database: durable facts + embedding-backed retrieval for ongoing
 context while building software.
 
-## Maintainer
+## Maintainer and scope
 
-Built and maintained by **AmirahCo**.
+Maintained by **AmirahCo** in the public repository owned by
+[@soin8293](https://github.com/soin8293). This is an experimental, local-first
+tool rather than a hosted memory service; users control the stores and session
+paths they configure.
 
 ## Install
 
 From repository root:
 
 ```bash
-python3 -m pip install -e .
+python -m pip install -e .
 ```
 
 Optional semantic stack (FAISS + FastEmbed):
 
 ```bash
-python3 -m pip install -e '.[semantic]'
+python -m pip install -e '.[semantic]'
 ```
 
 ## Quickstart
@@ -37,8 +40,8 @@ python3 -m pip install -e '.[semantic]'
 bash memory_system/tools/memory_ops.sh bootstrap my-project
 
 # Add/retrieve memory via MemoryDB object API
-python3 -m memory_system.memorydb jot --project my-project "token refresh is 15 minutes"
-python3 -m memory_system.memorydb lookup --project my-project "token refresh"
+python -m memory_system.memorydb jot --project my-project "token refresh is 15 minutes"
+python -m memory_system.memorydb lookup --project my-project "token refresh"
 
 # Consolidated pipelines
 bash memory_system/tools/memory_ops.sh session-start
@@ -93,6 +96,21 @@ You can override with:
 ```bash
 export MEMORY_SESSION_ROOTS="$HOME/.codex/sessions:$HOME/.claude/projects:$HOME/.openclaw/agents/main/sessions"
 ```
+
+Only configure session roots you are authorized to process. Session logs may
+contain prompts, code, paths, or personal information; keep runtime data out of
+Git and apply the access controls appropriate to the source material.
+
+## Verification and limitations
+
+- Python object and path behavior is covered by unit tests on Linux and Windows.
+- The full shell-tool suite and distribution build run on Linux CI.
+- Semantic recall is optional and depends on the separately installed FAISS and
+  FastEmbed stack.
+- Keyword/FTS fallback behavior is deterministic, but semantic ranking can vary
+  with the embedding model and dependency versions.
+- This project has not been benchmarked as a hosted, multi-user, or production
+  database service.
 
 ## Repository docs
 
