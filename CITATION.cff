@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using this metadata."
+type: software
+title: "memory_Db"
+version: 0.2.0
+date-released: 2026-08-23
+authors:
+  - family-names: Inene
+    given-names: Sorbarikor
+    affiliation: AmirahCo
+repository-code: "https://github.com/soin8293/memory_Db"
+license: MIT

@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    {"id": "decision:auth", "type": "decision", "scope": "synthetic-benchmark", "ts": "2026-01-01T09:00:00Z", "text": "Browser clients use OAuth2 PKCE for authentication", "tags": ["security", "auth"]},
+    {"id": "decision:cache", "type": "decision", "scope": "synthetic-benchmark", "ts": "2026-01-02T09:00:00Z", "text": "The cache expires entries after fifteen minutes", "tags": ["cache"]},
+    {"id": "incident:quota", "type": "incident", "scope": "synthetic-benchmark", "ts": "2026-01-03T09:00:00Z", "text": "API requests failed after exceeding the hourly quota", "tags": ["api", "incident"]},
+    {"id": "rule:backup", "type": "rule", "scope": "synthetic-benchmark", "ts": "2026-01-04T09:00:00Z", "text": "Encrypted backups run every night at midnight", "tags": ["backup", "privacy"]},
+    {"id": "note:schema", "type": "note", "scope": "synthetic-benchmark", "ts": "2026-01-05T09:00:00Z", "text": "Database migrations require a reviewed rollback script", "tags": ["database"]},
+    {"id": "decision:logs", "type": "decision", "scope": "synthetic-benchmark", "ts": "2026-01-06T09:00:00Z", "text": "Application logs redact access tokens before storage", "tags": ["logging", "security"]},
+    {"id": "note:alerts", "type": "note", "scope": "synthetic-benchmark", "ts": "2026-01-07T09:00:00Z", "text": "Latency alerts trigger above five hundred milliseconds", "tags": ["monitoring"]},
+    {"id": "rule:review", "type": "rule", "scope": "synthetic-benchmark", "ts": "2026-01-08T09:00:00Z", "text": "Infrastructure changes need peer review before deployment", "tags": ["infrastructure"]},
+    {"id": "note:queue", "type": "note", "scope": "synthetic-benchmark", "ts": "2026-01-09T09:00:00Z", "text": "The worker queue retries transient jobs three times", "tags": ["reliability"]},
+    {"id": "decision:region", "type": "decision", "scope": "synthetic-benchmark", "ts": "2026-01-10T09:00:00Z", "text": "Customer records remain in the selected data region", "tags": ["privacy"]},
+    {"id": "incident:cert", "type": "incident", "scope": "synthetic-benchmark", "ts": "2026-01-11T09:00:00Z", "text": "Certificate rotation failed because the service account lacked permission", "tags": ["security", "incident"]},
+    {"id": "rule:tests", "type": "rule", "scope": "synthetic-benchmark", "ts": "2026-01-12T09:00:00Z", "text": "Release builds require unit and integration tests", "tags": ["testing"]}
+  ],
+  "queries": [
+    {"query": "OAuth2 PKCE", "expected_text": "Browser clients use OAuth2 PKCE for authentication"},
+    {"query": "encrypted backups", "expected_text": "Encrypted backups run every night at midnight"},
+    {"query": "redact access tokens", "expected_text": "Application logs redact access tokens before storage"},
+    {"query": "peer review deployment", "expected_text": "Infrastructure changes need peer review before deployment"},
+    {"query": "transient jobs retries", "expected_text": "The worker queue retries transient jobs three times"},
+    {"query": "selected data region", "expected_text": "Customer records remain in the selected data region"},
+    {"query": "service account permission", "expected_text": "Certificate rotation failed because the service account lacked permission"},
+    {"query": "unit integration tests", "expected_text": "Release builds require unit and integration tests"}
+  ]
+}

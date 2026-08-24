@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "dataset": "synthetic-agent-memory-v1",
+  "node_count": 12,
+  "query_count": 8,
+  "repeats_per_query": 50,
+  "environment": {
+    "python": "3.12.10",
+    "platform": "Windows",
+    "processor": "AMD64"
+  },
+  "modes": {
+    "linear_scan": {
+      "mean_reciprocal_rank": 1.0,
+      "recall_at_3": 1.0,
+      "median_latency_ms": 0.2156,
+      "p95_latency_ms": 0.3171,
+      "query_executions": 400,
+      "cases": [
+        {
+          "query": "OAuth2 PKCE",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "encrypted backups",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "redact access tokens",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "peer review deployment",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "transient jobs retries",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "selected data region",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "service account permission",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "unit integration tests",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        }
+      ]
+    },
+    "inverted_index": {
+      "mean_reciprocal_rank": 1.0,
+      "recall_at_3": 1.0,
+      "median_latency_ms": 0.18,
+      "p95_latency_ms": 0.2657,
+      "query_executions": 400,
+      "cases": [
+        {
+          "query": "OAuth2 PKCE",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "encrypted backups",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "redact access tokens",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "peer review deployment",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "transient jobs retries",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "selected data region",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "service account permission",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        },
+        {
+          "query": "unit integration tests",
+          "reciprocal_rank": 1.0,
+          "retrieved_at_3": true
+        }
+      ]
+    }
+  },
+  "semantic_mode": {
+    "status": "not_run",
+    "reason": "Optional FAISS/FastEmbed dependencies and a pinned model are outside this dependency-free baseline."
+  }
+}

@@ -112,6 +112,21 @@ Git and apply the access controls appropriate to the source material.
 - This project has not been benchmarked as a hosted, multi-user, or production
   database service.
 
+## Reproducible retrieval baseline
+
+The repository includes a fully synthetic benchmark comparing the linear-scan
+and inverted-index keyword paths:
+
+```bash
+python benchmarks/run_benchmark.py
+```
+
+See [`docs/retrieval-benchmark.md`](docs/retrieval-benchmark.md) for the method,
+metrics, and limitations; [`docs/privacy-model.md`](docs/privacy-model.md) for
+the data-flow threat model; and `results/retrieval-baseline.json` for the
+committed machine-specific baseline. The optional semantic stack is explicitly
+marked as not run rather than represented by invented results.
+
 ## Repository docs
 
 - Core guide: `memory_system/README.md`
