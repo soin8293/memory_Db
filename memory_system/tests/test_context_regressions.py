@@ -70,6 +70,14 @@ class ContextRegressionTests(unittest.TestCase):
         with patch.dict(os.environ, {"MEMORY_SYSTEM_DATA_DIR": str(nodes.parent)}):
             self.assertEqual([n["id"] for n in session_context.load_nodes()], ["configured"])
 
+    def test_external_successor_cannot_hide_a_cycle_member(self):
+        ids = self.context([
+            self.node("one", meta={"supersedes": "two"}),
+            self.node("two", meta={"supersedes": "one"}),
+            self.node("new", meta={"supersedes": "one"}),
+        ])
+        self.assertEqual(set(ids), {"one", "two", "new"})
+
     def test_summary_keeps_late_correction_with_bounded_recent_sample(self):
         source = self.root / "session.jsonl"
         target = self.root / "summary.md"

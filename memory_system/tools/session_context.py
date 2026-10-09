@@ -125,8 +125,12 @@ def active_nodes(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                 pending.extend(edges.get(current, ()))
         return False
 
-    superseded = {target for source, targets in edges.items() for target in targets
-                  if not reaches(target, source)}
+    # Membership, not just each incoming edge, determines whether a conflict is
+    # unresolved. An outside successor must not hide one member of a cycle.
+    cyclic = {source for source, targets in edges.items()
+              if any(reaches(target, source) for target in targets)}
+    superseded = {target for targets in edges.values() for target in targets
+                  if target not in cyclic}
     return [n for n in nodes if (n.get("scope"), n.get("id")) not in superseded]
 
 
