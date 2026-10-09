@@ -28,7 +28,10 @@ _REPO_ROOT = str(Path(__file__).resolve().parents[2])
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-NODES_PATH = os.path.join(_REPO_ROOT, "memory_system", "data", "nodes.jsonl")
+from memory_system.paths import default_nodes_path
+
+# Optional override retained for callers; otherwise resolve current configuration.
+NODES_PATH = None
 
 # Node types worth injecting at session start (ordered by priority)
 INJECT_TYPES = {"rule", "decision", "constraint"}
@@ -38,15 +41,18 @@ HIGH_SIGNAL_TAGS = {"constraint", "risk", "decision", "rule", "next-step"}
 
 def load_nodes() -> List[Dict[str, Any]]:
     nodes = []
-    if not os.path.exists(NODES_PATH):
+    nodes_path = NODES_PATH or default_nodes_path()
+    if not os.path.exists(nodes_path):
         return nodes
-    with open(NODES_PATH, "r", encoding="utf-8") as f:
+    with open(nodes_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
             try:
-                nodes.append(json.loads(line))
+                node = json.loads(line)
+                if isinstance(node, dict):
+                    nodes.append(node)
             except json.JSONDecodeError:
                 continue
     return nodes
@@ -91,12 +97,47 @@ def score_node(node: Dict[str, Any]) -> float:
     return s
 
 
+def active_nodes(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Resolve explicit same-scope supersession; retain cycles for human review.
+
+    Generic links are references, not supersession. No ledger data is deleted.
+    """
+    by_key = {(n.get("scope"), n.get("id")): n for n in nodes if n.get("id")}
+    edges = {}
+    for key, node in by_key.items():
+        meta = node.get("meta")
+        supersedes = meta.get("supersedes", []) if isinstance(meta, dict) else []
+        if isinstance(supersedes, str):
+            supersedes = [supersedes]
+        if not isinstance(supersedes, list):
+            supersedes = []
+        edges[key] = {(key[0], old) for old in supersedes
+                      if isinstance(old, str) and (key[0], old) in by_key}
+
+    def reaches(start, goal):
+        pending, seen = [start], set()
+        while pending:
+            current = pending.pop()
+            if current == goal:
+                return True
+            if current not in seen:
+                seen.add(current)
+                pending.extend(edges.get(current, ()))
+        return False
+
+    superseded = {target for source, targets in edges.items() for target in targets
+                  if not reaches(target, source)}
+    return [n for n in nodes if (n.get("scope"), n.get("id")) not in superseded]
+
+
 def get_context(scope: str | None = None, top: int = 5) -> List[Dict[str, Any]]:
     nodes = load_nodes()
 
     # Filter by scope
     if scope:
         nodes = [n for n in nodes if n.get("scope") == scope or n.get("scope") == "global"]
+
+    nodes = active_nodes(nodes)
 
     # Filter to injectable types + high-signal notes
     injectable = []
