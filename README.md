@@ -140,3 +140,11 @@ marked as not run rather than represented by invented results.
 ## License
 
 MIT (`LICENSE`).
+
+## Context correctness boundaries (October 2026)
+
+Explicit-store recall (`--nodes`, including the object API) scans only that ledger and bypasses the legacy default keyword index, which has no store-identity contract. This trades index speed for isolation; missing explicit ledgers return no results. The optional OpenClaw/semantic routes are separate and are not validated by this repair.
+
+Startup context now resolves the configured `MEMORY_SYSTEM_DATA_DIR`/`MEMORY_SYSTEM_HOME` and recognizes `meta.supersedes` as an old ID or list of old IDs in the same scope. Generic `links` do not retire decisions. Superseded records remain in the append-only ledger; cycles remain visible for human resolution. Project records cannot retire global or other-project records. Ranking and top-N limits still apply.
+
+Session summaries retain the most recent bounded message sample and report omitted-message counts. This preserves corrections near the end of a session instead of always retaining its beginning. Earlier requirements and long-message tails may still be omitted; summaries are incomplete aids, not authoritative task-state reconstruction. Review original records before promoting decisions. No real private session or semantic model is required by the synthetic regression tests.

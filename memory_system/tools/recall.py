@@ -185,12 +185,14 @@ def faiss_fallback(query: str, topk: int, backend: str = "fastembed", model: str
 
 
 def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None) -> List[Dict[str, Any]]:
-    """Heuristic fallback using keyword index (O(1) per token) with nodes.jsonl scan as last resort."""
+    """Search an explicit ledger directly; use the default index only without an override."""
     toks = tokenize(query)
 
     # Try keyword index first (fast path)
     kw_index_path = default_nodes_path().parent / "keyword_index.json"
-    if kw_index_path.exists() and toks:
+    # The legacy index carries no ledger identity. It cannot safely serve an
+    # explicit store, even if that file happens to live in the same directory.
+    if nodes_path is None and kw_index_path.exists() and toks:
         try:
             kw_index = json.loads(kw_index_path.read_text(encoding="utf-8"))
             node_meta = kw_index.get("_nodes", {})

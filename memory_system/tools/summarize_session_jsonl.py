@@ -24,6 +24,7 @@ import json
 import os
 import re
 from datetime import datetime
+from collections import deque
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 
@@ -44,7 +45,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--limit-tools", type=int, default=80)
     p.add_argument("--limit-errors", type=int, default=80)
     p.add_argument("--max-text", type=int, default=220)
-    return p.parse_args()
+    args = p.parse_args()
+    if min(args.limit_messages, args.limit_tools, args.limit_errors) < 0 or args.max_text < 4:
+        p.error("sample limits must be nonnegative and --max-text must be at least 4")
+    return args
 
 
 def safe_load(line: str) -> Optional[Dict[str, Any]]:
@@ -62,7 +66,7 @@ def main() -> int:
     if not os.path.exists(in_path):
         raise SystemExit(f"Input not found: {in_path}")
 
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
 
     counts = {
         "lines": 0,
@@ -71,7 +75,8 @@ def main() -> int:
         "errors": 0,
     }
 
-    messages: List[str] = []
+    messages = deque(maxlen=args.limit_messages)
+    valid_messages = 0
     tools: List[str] = []
     errors: List[str] = []
 
@@ -102,17 +107,17 @@ def main() -> int:
 
             # Messages
             if (role in ("user", "assistant")) or (t in ("user", "assistant", "message")):
-                if len(messages) < args.limit_messages:
-                    text = obj.get("message") or obj.get("text") or obj.get("content")
-                    if isinstance(text, list):
-                        text = " ".join(str(x) for x in text)
-                    if isinstance(text, dict):
-                        text = json.dumps(text, ensure_ascii=False)
-                    if isinstance(text, str) and text.strip():
-                        who = role or t or "message"
-                        mid = obj.get("message_id") or obj.get("messageId")
-                        mid_s = f" ({mid})" if mid else ""
-                        messages.append(f"- **{who}**{mid_s}: {clip(text, args.max_text)}")
+                text = obj.get("message") or obj.get("text") or obj.get("content")
+                if isinstance(text, list):
+                    text = " ".join(str(x) for x in text)
+                if isinstance(text, dict):
+                    text = json.dumps(text, ensure_ascii=False)
+                if isinstance(text, str) and text.strip():
+                    who = role or t or "message"
+                    mid = obj.get("message_id") or obj.get("messageId")
+                    mid_s = f" ({mid})" if mid else ""
+                    valid_messages += 1
+                    messages.append(f"- **{who}**{mid_s}: {clip(text, args.max_text)}")
                 counts["messages"] += 1
                 continue
 
@@ -149,6 +154,7 @@ def main() -> int:
     md.append(f"- source: `{in_path}`\n")
     md.append(f"- lines: {counts['lines']}\n")
     md.append(f"- messages_seen: {counts['messages']}\n")
+    md.append(f"- messages_omitted: {valid_messages - len(messages)}\n")
     md.append(f"- tool_events_seen: {counts['tools']}\n")
     md.append(f"- errors_seen: {counts['errors']}\n")
     if first_ts:
@@ -157,7 +163,8 @@ def main() -> int:
         md.append(f"- last_ts: `{last_ts}`\n")
     md.append("\n")
 
-    md.append("## Messages (sampled)\n")
+    md.append("## Messages (most recent sample)\n")
+    md.append("Earlier messages may be omitted and text is clipped; consult the source before treating this as complete context.\n\n")
     md.extend([m + "\n" for m in messages] or ["- (none captured)\n"])
     md.append("\n")
 
@@ -171,7 +178,7 @@ def main() -> int:
 
     md.append("## Promote to durable memory (manual step)\n")
     md.append("If anything here is durable (rule/decision/incident), append a node via:\n\n")
-    md.append("```bash\npython3 memory/tools/add_node.py --type incident --id incident:<slug> --scope <global|project> --text \"...\" --tags ...\n```\n")
+    md.append("```bash\npython3 memory_system/tools/add_node.py --type incident --id incident:<slug> --scope <global|project> --text \"...\" --tags ...\n```\n")
 
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("".join(md))
