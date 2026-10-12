@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from memory_system.tools import recall
 
@@ -59,3 +59,27 @@ class RecallBoundaryTests(unittest.TestCase):
             with patch.object(sys, "argv", ["recall", "--query", "fixture", "--nodes", str(ledger)]):
                 with self.assertRaises(SystemExit):
                     recall.main()
+
+    def test_rejected_hybrid_session_triggers_ledger_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            marker = Path(tmp) / "mock-index.marker"
+            marker.touch()  # Existence fixture only; no SQLite file is opened.
+            connection = MagicMock()
+            cursor = connection.cursor.return_value
+            cursor.execute.return_value = cursor
+            cursor.fetchall.side_effect = [[("stale", "chunk", "alpha", "note", "fixture", 0)], []]
+            cursor.fetchone.return_value = ("alpha", "note", "", "fixture.jsonl", "old-session", None, "fixture")
+            embedder = MagicMock()
+            embedder.embed_texts.return_value.vectors = [[1.0]]
+            hit = {"node_id": "current", "project_id": "alpha", "session_id": "current-session", "source_path": "fixture.jsonl"}
+            output = io.StringIO()
+            with patch.object(sys, "argv", ["recall", "--query", "fixture", "--project-id", "alpha", "--session-id", "current-session", "--db", str(marker)]), \
+                 patch.object(recall, "query_openclaw", return_value=[]), \
+                 patch.object(recall, "faiss_fallback", return_value=[]), \
+                 patch.object(recall.sqlite3, "connect", return_value=connection), \
+                 patch("memory_system.embeddings.factory.get_embedder", return_value=embedder), \
+                 patch.object(recall, "heuristic_fallback", return_value=[hit]) as fallback, \
+                 contextlib.redirect_stdout(output):
+                recall.main()
+            fallback.assert_called_once()
+            self.assertEqual(json.loads(output.getvalue()), [hit])

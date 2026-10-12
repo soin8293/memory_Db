@@ -544,6 +544,9 @@ def main() -> int:
         finally:
             con.close()
 
+    # Rejected hybrid candidates must not suppress valid ledger fallback.
+    results.sort(key=lambda r: (float(r.get("score") or 0.0), str(r.get("ts") or "")), reverse=True)
+    results = filter_results(results, args)
     # fallback if nothing
     if not results:
         # FTS-only already attempted above; now heuristic.
