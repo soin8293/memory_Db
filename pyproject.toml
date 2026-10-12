@@ -27,8 +27,11 @@ semantic = ["faiss-cpu>=1.7.0", "numpy>=1.20.0", "fastembed>=0.1.0"]
 memorydb = "memory_system.memorydb:cli"
 
 [tool.setuptools]
-packages = ["memory_system"]
 include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["memory_system*"]
+exclude = ["memory_system.tests*"]
 
 [tool.setuptools.package-data]
 memory_system = ["tools/*", "policy/*", "docs/*", "templates/*", "*.md", "*.json"]

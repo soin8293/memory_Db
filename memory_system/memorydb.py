@@ -271,6 +271,8 @@ class MemoryDB:
                 query,
                 "--nodes",
                 os.path.join(self.project_dir, "nodes.jsonl"),
+                "--project-id",
+                self.project,
             )
         return subprocess.check_output(cmd, text=True)
 

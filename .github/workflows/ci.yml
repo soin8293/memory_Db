@@ -55,3 +55,10 @@ jobs:
         run: |
           python -m pip install build
           python -m build
+
+      - name: Verify installed wheel outside checkout
+        run: |
+          python -m pip install --force-reinstall dist/*.whl
+          cd "${{ runner.temp }}"
+          python -c "from memory_system.embeddings.factory import get_embedder; from memory_system.tools import recall; assert get_embedder('hash').embed_texts(['fixture']).vectors"
+          memorydb --help
