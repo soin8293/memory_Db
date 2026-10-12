@@ -184,7 +184,7 @@ def faiss_fallback(query: str, topk: int, backend: str = "fastembed", model: str
         return []
 
 
-def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None) -> List[Dict[str, Any]]:
+def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None, *, args=None) -> List[Dict[str, Any]]:
     """Search an explicit ledger directly; use the default index only without an override."""
     toks = tokenize(query)
 
@@ -212,7 +212,7 @@ def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None)
             if node_scores:
                 ranked = sorted(node_scores.items(), key=lambda x: (x[1], node_meta.get(x[0], {}).get("ts", "")), reverse=True)
                 results: List[Dict[str, Any]] = []
-                for nid, s in ranked[:topk]:
+                for nid, s in ranked:
                     meta = node_meta.get(nid, {})
                     results.append({
                         "node_id": nid,
@@ -224,7 +224,9 @@ def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None)
                         "preview": meta.get("text_preview", ""),
                         "provenance": "keyword_index",
                     })
-                return results
+                results = filter_results(results, args) if args else results[:topk]
+                if results:
+                    return results
         except Exception:
             pass  # Fall through to O(n) scan
 
@@ -251,7 +253,7 @@ def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None)
     out.sort(key=lambda x: (x[0], str(x[1].get("ts") or "")), reverse=True)
 
     results: List[Dict[str, Any]] = []
-    for s, n in out[:topk]:
+    for s, n in out:
         results.append(
             {
                 "node_id": n.get("id"),
@@ -261,10 +263,10 @@ def heuristic_fallback(query: str, topk: int, nodes_path: Optional[Path] = None)
                 "ts": n.get("ts"),
                 "source_path": (n.get("meta") or {}).get("source_path") if isinstance(n.get("meta"), dict) else None,
                 "preview": (n.get("text") or "")[:180],
-                "provenance": "heuristic",
+                "provenance": {"method": "heuristic", **(n.get("meta") if isinstance(n.get("meta"), dict) else {})},
             }
         )
-    return results
+    return filter_results(results, args) if args else results[:topk]
 
 
 def tokenize(q: str) -> List[str]:
@@ -294,6 +296,26 @@ def score_node(n: Dict[str, Any], toks: List[str]) -> int:
     return score
 
 
+def filter_results(results, args):
+    """Apply the same fail-closed scope and provenance contract to every backend."""
+    accepted = []
+    for hit in results:
+        if not args.global_ and hit.get("project_id") != args.project_id:
+            continue
+        provenance = hit.get("provenance")
+        provenance = provenance if isinstance(provenance, dict) else {}
+        if any(getattr(args, key) and
+               (hit.get(key) or provenance.get(key)) != getattr(args, key)
+               for key in ("node_type", "session_id", "entity_id")):
+            continue
+        has_source = any(hit.get(key) or provenance.get(key)
+                         for key in ("source_path", "session_id", "entity_id"))
+        if args.strict_provenance and not has_source:
+            continue
+        accepted.append(hit)
+    return accepted[:args.topk]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--query", required=True)
@@ -320,14 +342,16 @@ def main() -> int:
 
     args = ap.parse_args()
 
-    if args.nodes:
-        # nodes override: heuristic-only search
-        results = heuristic_fallback(args.query, args.topk, Path(args.nodes))
-        print(json.dumps(results, ensure_ascii=False, indent=2))
-        return 0
-
     if not args.global_ and not args.project_id:
         raise SystemExit("--project-id is required (or pass --global)")
+    if args.topk <= 0:
+        raise SystemExit("--topk must be positive")
+
+    if args.nodes:
+        # nodes override: heuristic-only search
+        results = filter_results(heuristic_fallback(args.query, args.topk, Path(args.nodes), args=args), args)
+        print(json.dumps(results, ensure_ascii=False, indent=2))
+        return 0
 
     # Use hierarchical retrieval if requested
     if args.hierarchical:
@@ -337,18 +361,20 @@ def main() -> int:
             topk=args.topk,
             half_life_days=args.half_life,
         )
-        print(json.dumps(results, ensure_ascii=False, indent=2))
-        return 0
+        results = filter_results(results, args)
+        if results:
+            print(json.dumps(results, ensure_ascii=False, indent=2))
+            return 0
 
     # Try OpenClaw unified index first (faster, cached, better quality)
     if args.use_openclaw and not args.no_openclaw:
-        results = query_openclaw(args.query, args.topk, args.min_score)
+        results = filter_results(query_openclaw(args.query, args.topk, args.min_score), args)
         if results:
             print(json.dumps(results, ensure_ascii=False, indent=2))
             return 0
 
     # Try FAISS fallback (O(log n) local search)
-    faiss_results = faiss_fallback(args.query, args.topk, args.backend, args.model)
+    faiss_results = filter_results(faiss_fallback(args.query, args.topk, args.backend, args.model), args)
     if faiss_results:
         print(json.dumps(faiss_results, ensure_ascii=False, indent=2))
         return 0
@@ -518,14 +544,17 @@ def main() -> int:
         finally:
             con.close()
 
+    # Rejected hybrid candidates must not suppress valid ledger fallback.
+    results.sort(key=lambda r: (float(r.get("score") or 0.0), str(r.get("ts") or "")), reverse=True)
+    results = filter_results(results, args)
     # fallback if nothing
     if not results:
         # FTS-only already attempted above; now heuristic.
-        results = heuristic_fallback(args.query, args.topk)
+        results = heuristic_fallback(args.query, args.topk, args=args)
 
     # Final sort and cap
     results.sort(key=lambda r: (float(r.get("score") or 0.0), str(r.get("ts") or "")), reverse=True)
-    results = results[: args.topk]
+    results = filter_results(results, args)
 
     print(json.dumps(results, ensure_ascii=False, indent=2))
     return 0

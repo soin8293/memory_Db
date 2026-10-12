@@ -12,6 +12,17 @@ In practice, users create a project `MemoryDB` object and treat it as the
 agent's memory database: durable facts + embedding-backed retrieval for ongoing
 context while building software.
 
+## Retrieval boundaries and next depth
+
+The recall CLI requires `--project-id` or explicit `--global`, including with
+`--nodes`. Every backend result is filtered before output. Unknown project scope
+is rejected in scoped mode; adapters without project metadata can therefore
+fall back to local recall. `--strict-provenance` requires a source path, session
+or entity reference rather than trusting a backend's status label. The optional
+semantic adapters remain subject to their own setup and evaluation limits.
+See [the engineering roadmap](docs/engineering-roadmap.md).
+
+
 ## Maintainer and scope
 
 Maintained by **AmirahCo** in the public repository owned by
@@ -136,6 +147,16 @@ marked as not run rather than represented by invented results.
 - Security: `SECURITY.md`
 - Code of conduct: `CODE_OF_CONDUCT.md`
 - Release checklist: `RELEASE_CHECKLIST.md`
+
+## AI assistance
+
+Recent maintenance repairs included AI-assisted code changes, regression tests,
+and documentation.
+
+The maintainer, soin8293, is responsible for project decisions and for reviewing
+and validating contributions. AI assistance does not establish correctness,
+security, or production readiness; consult the documented checks and
+limitations. Existing licenses and upstream credits remain applicable.
 
 ## License
 
